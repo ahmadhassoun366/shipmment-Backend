@@ -1,10 +1,10 @@
 // routes/accountRoutes.js
 const express = require('express');
 const router = express.Router();
-const warehouseController = require('../controllers/warehouseController');
+const customerController = require('../controllers/customerController');
 
 // Route to create a new account
-router.post('/createWarehouse', warehouseController.createWarehouse);
+router.get('/getCustomers', customerController.getCustomers);
 
 // Define other routes for reading, updating, deleting accounts
 // Example: router.get('/accounts', accountController.getAccounts);

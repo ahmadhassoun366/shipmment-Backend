@@ -23,6 +23,33 @@ mongoose.connect(process.env.MONGO_URI, {
 const accountRoutes = require('./routes/accountRoutes.js'); // Import account routes
 app.use(accountRoutes); // Use account routes
 
+const customersRoutes = require('./routes/customersRoutes.js'); // Import account routes
+app.use(customersRoutes); // Use account routes
+
+const receiversRoutes = require('./routes/receiversRoutes.js'); // Import account routes
+app.use(receiversRoutes); // Use account routes
+
+const ordersRoutes = require('./routes/ordersRoute.js'); // Import account routes
+app.use(ordersRoutes); // Use account routes
+
+const paymentsRoutes = require('./routes/paymentsRoutes.js'); // Import account routes
+app.use(paymentsRoutes); // Use paymentsRoutes routes
+
+const shipmentsRoutes = require('./routes/shipmentsRoutes.js'); // Import account routes
+app.use(shipmentsRoutes); // Use shipment routes
+
+const postEmployee = require('./routes/postEmployee.js'); // Import account routes
+app.use(postEmployee); // Use shipment routes
+
+const shippingCompaniesRoutes = require('./routes/shippingCompaniesRoutes.js'); // Import account routes
+app.use(shippingCompaniesRoutes); // Use shippingCompaniesRoutes routes
+
+const shippingInfoRoutes = require('./routes/shippingInfoRoutes.js'); // Import account routes
+app.use(shippingInfoRoutes); // Use account routes
+
+const warehouseRoutes = require('./routes/warehouseRoutes.js'); // Import account routes
+app.use(warehouseRoutes); // Use warehouseRoutes routes
+
 // Define a simple route
 app.get('/', (req, res) => {
     res.send('Welcome to the Shipping API');

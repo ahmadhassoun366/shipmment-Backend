@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const accountSchema = new mongoose.Schema({
+const shippingCompaniesSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: {
     type: String,
@@ -9,10 +9,14 @@ const accountSchema = new mongoose.Schema({
     match:
       /([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|"([]!#-[^-~ \t]|(\\[\t -~]))+")@[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?(\.[0-9A-Za-z]([0-9A-Za-z-]{0,61}[0-9A-Za-z])?)+/,
   },
-  password: { type: String, required: true },
-  type: { type: String, enum: ["Customer", "Receiver"], required: true },
+  phone: {
+    type: Number,
+    required: true,
+  },
 });
 
-const Account = mongoose.model("Account", accountSchema);
+const shippingCompanies = mongoose.model("shippingCompanies",
+  shippingCompaniesSchema
+);
 
-module.exports = Account;
+module.exports = shippingCompanies;
