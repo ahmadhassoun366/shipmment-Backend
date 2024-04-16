@@ -29,23 +29,20 @@ app.use(customersRoutes); // Use account routes
 const receiversRoutes = require('./routes/receiversRoutes.js'); // Import account routes
 app.use(receiversRoutes); // Use account routes
 
-const ordersRoutes = require('./routes/ordersRoute.js'); // Import account routes
-app.use(ordersRoutes); // Use account routes
-
-const paymentsRoutes = require('./routes/paymentsRoutes.js'); // Import account routes
-app.use(paymentsRoutes); // Use paymentsRoutes routes
-
 const shipmentsRoutes = require('./routes/shipmentsRoutes.js'); // Import account routes
 app.use(shipmentsRoutes); // Use shipment routes
 
 const postEmployee = require('./routes/postEmployee.js'); // Import account routes
 app.use(postEmployee); // Use shipment routes
 
-const shippingCompaniesRoutes = require('./routes/shippingCompaniesRoutes.js'); // Import account routes
-app.use(shippingCompaniesRoutes); // Use shippingCompaniesRoutes routes
+const receiptRoutes = require('./routes/receiptRoutes.js'); // Import account routes
+app.use(receiptRoutes); // Use shipment routes
 
-const shippingInfoRoutes = require('./routes/shippingInfoRoutes.js'); // Import account routes
-app.use(shippingInfoRoutes); // Use account routes
+const itemRoutes = require('./routes/itemRoutes.js'); // Import account routes
+app.use(itemRoutes); // Use shipment routes
+
+const shipmentItemRoutes = require('./routes/shipmentItemRoutes.js'); // Import account routes
+app.use(shipmentItemRoutes); // Use shipment routes
 
 const warehouseRoutes = require('./routes/warehouseRoutes.js'); // Import account routes
 app.use(warehouseRoutes); // Use warehouseRoutes routes
