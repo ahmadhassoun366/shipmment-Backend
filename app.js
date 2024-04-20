@@ -38,8 +38,8 @@ app.use(paymentsRoutes); // Use paymentsRoutes routes
 const shipmentsRoutes = require('./routes/shipmentsRoutes.js'); // Import account routes
 app.use(shipmentsRoutes); // Use shipment routes
 
-const postEmployee = require('./routes/postEmployee.js'); // Import account routes
-app.use(postEmployee); // Use shipment routes
+// const postEmployee = require('./routes/postEmployee.js'); // Import account routes
+// app.use(postEmployee); // Use shipment routes
 
 const shippingCompaniesRoutes = require('./routes/shippingCompaniesRoutes.js'); // Import account routes
 app.use(shippingCompaniesRoutes); // Use shippingCompaniesRoutes routes
