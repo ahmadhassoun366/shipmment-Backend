@@ -7,15 +7,15 @@ const warehouseController = require("../controllers/warehouseController");
 router.post("/createWarehouse", warehouseController.createWarehouse);
 
 // Route to retrieve all warehouses
-router.get("/warehouses", warehouseController.getWarehouses);
+router.get("/getWarehouses", warehouseController.getWarehouses);
 
 // Route to retrieve a warehouse by ID
-router.get("/warehouses/:id", warehouseController.getWarehouseById);
+router.get("/getWarehouse/:id", warehouseController.getWarehouseById);
 
 // Route to update a warehouse
-router.put("/warehouses/:id", warehouseController.updateWarehouse);
+router.put("/updateWarehouse/:id", warehouseController.updateWarehouse);
 
 // Route to delete a warehouse
-router.delete("/warehouses/:id", warehouseController.deleteWarehouse);
+router.delete("/deleteWarehouse/:id", warehouseController.deleteWarehouse);
 
 module.exports = router;

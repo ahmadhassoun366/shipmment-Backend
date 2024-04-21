@@ -7,15 +7,15 @@ const receiptController = require("../controllers/receiptController");
 router.post("/createReceipt", receiptController.createReceipt);
 
 // Route to get all receipts
-router.get("/receipts", receiptController.getReceipts);
+router.get("/getReceipts", receiptController.getReceipts);
 
 // Route to get a single receipt by ID
-router.get("/receipts/:id", receiptController.getReceiptById);
+router.get("/getReceipt/:id", receiptController.getReceiptById);
 
 // Route to update a receipt
-router.put("/receipts/:id", receiptController.updateReceipt);
+router.put("/updateReceipt/:id", receiptController.updateReceipt);
 
 // Route to delete a receipt
-router.delete("/receipts/:id", receiptController.deleteReceipt);
+router.delete("/DeleteReceipt/:id", receiptController.deleteReceipt);
 
 module.exports = router;

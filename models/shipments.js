@@ -34,7 +34,8 @@ const shipmentSchema = new mongoose.Schema({
         ref: 'Warehouse',
         required: true
     }
-});
+    
+});//last_update_dby/status
 
 // Create the Shipment model based on the schema
 const Shipment = mongoose.model('Shipment', shipmentSchema);
