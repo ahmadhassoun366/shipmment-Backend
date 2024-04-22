@@ -2,12 +2,8 @@
 const mongoose = require('mongoose');
 
 const shipmentItemSchema = new mongoose.Schema({
-    shipmentID: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Shipment',
-        required: true
-    },
-    itemID: {
+   
+    item_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Item',
         required: true
@@ -15,7 +11,12 @@ const shipmentItemSchema = new mongoose.Schema({
     quantity: {
         type: Number,
         required: true
-    }
+    },
+     customer_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Customer",
+    required: true,
+  },
 });
 
 const ShipmentItem = mongoose.model('ShipmentItem', shipmentItemSchema);
