@@ -8,12 +8,12 @@ router.post('/createItem', itemController.createItem);
 router.get('/getItems', itemController.getItems);
 
 // Route to retrieve a single item by ID
-router.get('/getItems/:id', itemController.getItemById);
+router.get('/getItem/:id', itemController.getItemById);
 
 // Route to update an existing item
-router.put('/updateItems/:id', itemController.updateItem);
+router.put('/updateItem/:id', itemController.updateItem);
 
 // Route to delete an item
-router.delete('/deleteItems/:id', itemController.deleteItem);
+router.delete('/deleteItem/:id', itemController.deleteItem);
 
 module.exports = router;
