@@ -33,6 +33,7 @@ const shipmentSchema = new mongoose.Schema({
     type: String,
     enum: ["Pending", "Completed", "Failed"],
     required: true,
+    set: (v) => v.charAt(0).toUpperCase() + v.slice(1).toLowerCase(),
   },
   warehouseID: {
     type: mongoose.Schema.Types.ObjectId,
@@ -40,7 +41,7 @@ const shipmentSchema = new mongoose.Schema({
     required: true,
   },
 
-  shipmentItemIDs: [
+  Items: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "ShipmentItem",

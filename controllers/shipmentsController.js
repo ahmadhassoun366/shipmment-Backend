@@ -2,98 +2,52 @@
 const Shipment = require("../models/shipments");
 const ShipmentItem = require("../models/shipmentItem");
 
-// Controller method to create a new shipment
 async function createShipment(req, res) {
-    try {
-      // Extract shipment data from the request body
-      const {
-        customer_id,
-        receiver_id,
-        origin,
-        destination,
-        shipmentDate,
-        expectedDeliveryDate,
-        status,
-        warehouseID,
-      } = req.body;
-  
-      // Find shipment items associated with the customer_id
-      const existingShipmentItems = await ShipmentItem.find({ customer_id });
-  
-      // Check if there are existing shipment items
-      if (existingShipmentItems.length === 0) {
-        // If there are no shipment items, create them first
-        const newShipmentItem = await ShipmentItem.create({
-          item_id: req.body.item_id,
-          quantity: req.body.quantity,
-          customer_id: req.body.customer_id,
-        });
-  
-        // Create the shipment with the new shipment item
-        const newShipment = await Shipment.create({
-          customer_id,
-          receiver_id,
-          origin,
-          destination,
-          shipmentDate,
-          expectedDeliveryDate,
-          status,
-          warehouseID,
-          shipmentItemIDs: [newShipmentItem._id], // Use the ID of the newly created shipment item
-        });
-  
-        res.status(201).json(newShipment);
-      } else {
-        // Filter existing shipment items to check if they have the same customer_id
-        const filteredShipmentItems = existingShipmentItems.filter(item => item.customer_id.toString() === customer_id);
-  
-        if (filteredShipmentItems.length === 0) {
-          // If there are no existing shipment items with the same customer_id, create a new one
-          const newShipmentItem = await ShipmentItem.create({
-            item_id: req.body.item_id,
-            quantity: req.body.quantity,
-            customer_id: req.body.customer_id,
-          });
-  
-          // Create the shipment with the new shipment item
-          const newShipment = await Shipment.create({
-            customer_id,
-            receiver_id,
-            origin,
-            destination,
-            shipmentDate,
-            expectedDeliveryDate,
-            status,
-            warehouseID,
-            shipmentItemIDs: [newShipmentItem._id], // Use the ID of the newly created shipment item
-          });
-  
-          res.status(201).json(newShipment);
-        } else {
-          // If there are existing shipment items with the same customer_id, use their IDs to create the shipment directly
-          const shipmentItemIDs = filteredShipmentItems.map(item => item._id);
-  
-          // Create the shipment with existing shipment item IDs
-          const newShipment = await Shipment.create({
-            customer_id,
-            receiver_id,
-            origin,
-            destination,
-            shipmentDate,
-            expectedDeliveryDate,
-            status,
-            warehouseID,
-            shipmentItemIDs,
-          });
-  
-          res.status(201).json(newShipment);
-        }
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      res.status(400).json({ message: error.message });
+  try {
+    const {
+      customer_id,
+      receiver_id,
+      origin,
+      destination,
+      shipmentDate,
+      expectedDeliveryDate,
+      status,
+      warehouseID,
+      items,
+    } = req.body;
+
+    // Create shipment items first
+    const Items = [];
+    for (const item of items) {
+      const newItem = await ShipmentItem.create({
+        name: item.name,
+        quantity: item.quantity,
+        customer_id: customer_id,
+        isSensitive: item.isSensitive || false
+      });
+      Items.push(newItem._id); // Use MongoDB's _id as item_id
     }
+
+    // Create the shipment with the new shipment items
+    const newShipment = await Shipment.create({
+      customer_id,
+      receiver_id,
+      origin,
+      destination,
+      shipmentDate,
+      expectedDeliveryDate,
+      status,
+      warehouseID,
+      Items: Items,
+    });
+
+    res.status(201).json(newShipment);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(400).json({ data: error.message });
   }
+}
+
   
   
 
