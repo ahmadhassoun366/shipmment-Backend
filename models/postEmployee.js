@@ -7,13 +7,8 @@ const postEmployeeSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    contactInfo: {
+    contact_info: {
         type: String,
-        required: true
-    },
-    warehouseID: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Warehouse',
         required: true
     }
 });

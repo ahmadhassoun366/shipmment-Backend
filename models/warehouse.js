@@ -8,6 +8,11 @@ const warehouseSchema = new mongoose.Schema({
     enum: ["Pending", "Completed", "Failed"],
     required: true,
   },
+  employee_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "PostEmployee",
+    required: true,
+  },
 });
 
 const Warehouse = mongoose.model("Warehouse", warehouseSchema);
