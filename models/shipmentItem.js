@@ -1,22 +1,10 @@
-// models/shipmentItem.js
 const mongoose = require('mongoose');
 
 const shipmentItemSchema = new mongoose.Schema({
-   
-    item_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Item',
-        required: true
-    },
-    quantity: {
-        type: Number,
-        required: true
-    },
-     customer_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Customer",
-    required: true,
-  },
+  name: { type: String, required: true },
+  quantity: { type: Number, required: true },
+  customer_id: { type: String, required: true },
+  isSensitive: { type: Boolean, default: false }
 });
 
 const ShipmentItem = mongoose.model('ShipmentItem', shipmentItemSchema);
