@@ -54,19 +54,18 @@ async function createShipment(req, res) {
 // Controller method to retrieve all shipments
 async function getShipments(req, res) {
   try {
-    const shipments = await Shipment.find();
+    const shipments = await Shipment.find().populate('Items');
     res.json(shipments);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 }
 
+
 // Controller method to retrieve a shipment by ID
 async function getShipmentById(req, res) {
   try {
-    const shipment = await Shipment.findById(req.params.id).populate(
-      "shipmentItems"
-    );
+    const shipment = await Shipment.findById(req.params.id).populate('Items');
     if (!shipment) {
       return res.status(404).json({ message: "Shipment not found" });
     }
@@ -75,6 +74,7 @@ async function getShipmentById(req, res) {
     res.status(400).json({ message: error.message });
   }
 }
+
 
 // Controller method to update a shipment
 async function updateShipment(req, res) {

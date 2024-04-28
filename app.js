@@ -38,8 +38,6 @@ app.use(shipmentsRoutes); // Use shipment routes
 const receiptRoutes = require('./routes/receiptRoutes.js'); // Import account routes
 app.use(receiptRoutes); // Use shipment routes
 
-const itemRoutes = require('./routes/itemRoutes.js'); // Import account routes
-app.use(itemRoutes); // Use shipment routes
 
 const shipmentItemRoutes = require('./routes/shipmentItemRoutes.js'); // Import account routes
 app.use(shipmentItemRoutes); // Use shipment routes
