@@ -9,7 +9,7 @@ const postEmployeeSchema = new mongoose.Schema({
     },
     contact_info: {
         type: String,
-        required: true
+        
     }
 });
 

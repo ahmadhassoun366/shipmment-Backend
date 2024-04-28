@@ -31,7 +31,7 @@ const shipmentSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["Pending", "Completed", "Failed"],
+    enum: ["Pending", "Packaging","On way", "Failed","Received"],
     required: true,
     set: (v) => v.charAt(0).toUpperCase() + v.slice(1).toLowerCase(),
   },

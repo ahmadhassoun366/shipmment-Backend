@@ -115,10 +115,36 @@ async function deleteShipment(req, res) {
   }
 }
 
+async function updateShipmentStatus(req, res) {
+  try {
+    const { shipmentId, newStatus } = req.body;
+
+    // Find the shipment by ID
+    const shipment = await Shipment.findById(shipmentId);
+    if (!shipment) {
+      return res.status(404).json({ message: "Shipment not found" });
+    }
+
+    // Check if the user is authorized (type === 'employee')
+    if (req.user.type !== 'Employee') {
+      return res.status(403).json({ message: "Only employees are authorized to update shipment status" });
+    }
+
+    // Update the shipment status
+    shipment.status = newStatus;
+    await shipment.save();
+
+    res.json({ message: "Shipment status updated successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
 module.exports = {
   createShipment,
   getShipments,
   getShipmentById,
   updateShipment,
   deleteShipment,
+  updateShipmentStatus,
 };

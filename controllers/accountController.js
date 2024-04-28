@@ -2,6 +2,8 @@
 const Account = require("../models/account");
 const bcrypt = require("bcryptjs");
 const generateToken = require("../utils/tokenUtils");
+const PostEmployee = require("../models/postEmployee");
+
 
 // Controller method for user signup (create account)
 async function signup(req, res) {
@@ -14,6 +16,15 @@ async function signup(req, res) {
       ...req.body,
       password: hashedPassword,
     });
+
+    // If the type is 'employee', create a PostEmployee entry
+    if (req.body.type === 'Employee') {
+      // Create a new post employee entry
+      const newEmployee = await PostEmployee.create({
+        name: req.body.name,
+        contact_info: req.body.contact_info,
+      });
+    }
 
     // Respond with the created account
     res.status(201).json(newAccount);
