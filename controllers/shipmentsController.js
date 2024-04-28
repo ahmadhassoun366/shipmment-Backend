@@ -102,6 +102,7 @@ async function updateShipment(req, res) {
   }
 }
 
+
 // Controller method to delete a shipment
 async function deleteShipment(req, res) {
   try {
@@ -112,6 +113,26 @@ async function deleteShipment(req, res) {
     res.json({ message: "Shipment deleted successfully" });
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+}
+// Controller method to retrieve shipments by user ID
+async function getShipmentsByUserId(req, res) {
+  try {
+    const userId = req.params.userId;
+
+    // Find shipments where the customer_id or receiver_id matches the user ID
+    const shipments = await Shipment.find({
+      $or: [{ customer_id: userId }, { receiver_id: userId }],
+    });
+
+    if (shipments.length === 0) {
+      return res.status(404).json({ message: "No shipments found for the provided user ID" });
+    }
+
+    res.json(shipments);
+  } catch (error) {
+    console.error(error); // Log the error for debugging
+    res.status(500).json({ message: "Internal server error" });
   }
 }
 
@@ -147,4 +168,5 @@ module.exports = {
   updateShipment,
   deleteShipment,
   updateShipmentStatus,
+  getShipmentsByUserId,
 };

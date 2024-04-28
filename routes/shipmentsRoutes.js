@@ -8,21 +8,23 @@ const authenticate = require('../middleware/authenticate');
 
 
 // Route to create a new shipment
-router.post("/createShipment", shipmentsController.createShipment);
+router.post("/createShipment",authenticate,checkRole('Customer'),shipmentsController.createShipment);
 
 // Route to retrieve all shipments
-router.get("/getShipments", shipmentsController.getShipments);
+router.get("/getShipments",authenticate,checkRole('Customer'), shipmentsController.getShipments);
 
 // Route to retrieve a shipment by ID
-router.get("/getShipment/:id", shipmentsController.getShipmentById);
+router.get("/getShipment/:id",authenticate,checkRole('Customer'), shipmentsController.getShipmentById);
 
 // Route to update a shipment
-router.put("/updateShipment/:id", shipmentsController.updateShipment);
+router.put("/updateShipment/:id",authenticate,checkRole('Customer'), shipmentsController.updateShipment);
 
 // Route to delete a shipment
-router.delete("/deleteShipment/:id", shipmentsController.deleteShipment);
+router.delete("/deleteShipment/:id",authenticate,checkRole('Customer'), shipmentsController.deleteShipment);
 
 router.put("/updateStatus", authenticate, checkRole('Employee'), shipmentsController.updateShipmentStatus);
+
+router.get("/getShipmentsByUser/:userId", authenticate, shipmentsController.getShipmentsByUserId);
 
 // Route to confirm receipt and update shipment status (accessible to receivers)
 router.put('/confirmReceipt/:id', authenticate, checkRole('Receiver'), async (req, res) => {

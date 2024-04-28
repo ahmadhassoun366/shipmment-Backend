@@ -27,11 +27,10 @@ const shipmentSchema = new mongoose.Schema({
   },
   expectedDeliveryDate: {
     type: Date,
-    required: true,
   },
   status: {
     type: String,
-    enum: ["Pending", "Packaging","On way", "Failed","Received"],
+    enum: ["Pending", "Packaging","onWay", "Failed","Received"],
     required: true,
     set: (v) => v.charAt(0).toUpperCase() + v.slice(1).toLowerCase(),
   },
