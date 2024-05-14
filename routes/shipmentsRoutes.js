@@ -10,24 +10,25 @@ const authenticate = require('../middleware/authenticate');
 // Route to create a new shipment
 router.post("/createShipment",authenticate,checkRole('Customer'),shipmentsController.createShipment);
 
-// Route to retrieve all shipments
-router.get("/getShipments",authenticate,checkRole('Customer'), shipmentsController.getShipments);
-
 // Route to retrieve a shipment by ID
-router.get("/getShipment/:id",authenticate,checkRole('Customer'), shipmentsController.getShipmentById);
+router.get("/getShipment",authenticate, shipmentsController.getShipmentById);
 
 // Route to update a shipment
-router.put("/updateShipment/:id",authenticate,checkRole('Customer'), shipmentsController.updateShipment);
+router.put("/updateShipment/:id", authenticate, shipmentsController.updateShipment);
 
 // Route to delete a shipment
 router.delete("/deleteShipment/:id",authenticate,checkRole('Customer'), shipmentsController.deleteShipment);
+// check role employee or receiver to update status please CHECK role for both employee and receiver
+router.put("/updateStatus/:id", authenticate, shipmentsController.updateShipmentStatus);
 
-router.put("/updateStatus", authenticate, checkRole('Employee'), shipmentsController.updateShipmentStatus);
+router.get("/getShipments", authenticate, shipmentsController.getShipmentsByUserId);
 
-router.get("/getShipmentsByUser/:userId", authenticate, shipmentsController.getShipmentsByUserId);
+router.put('/updateExpectedDeliveryDate/:id', shipmentsController.updateShipmentExpirationDate);
+
 
 // Route to confirm receipt and update shipment status (accessible to receivers)
-router.put('/confirmReceipt/:id', authenticate, checkRole('Receiver'), async (req, res) => {
+router.put('/confirmReceipt/:id',
+ authenticate, checkRole('Receiver'), async (req, res) => {
   try {
       const shipment = await Shipment.findById(req.params.id);
       if (!shipment) {

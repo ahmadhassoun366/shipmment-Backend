@@ -1,20 +1,17 @@
-// models/postEmployee.js
 const mongoose = require('mongoose');
 
-// Define the schema for the PostEmployee model
-const postEmployeeSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true
+const employeeSchema = new mongoose.Schema({
+    AccountID: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Account',
+        required: function() {
+            // Only require AccountID if the account type is 'customer'
+            return this.type === 'Employee';
+        }
     },
-    contact_info: {
-        type: String,
-        
-    }
+    // Other fields specific to Customer schema
 });
 
-// Create the PostEmployee model based on the schema
-const PostEmployee = mongoose.model('PostEmployee', postEmployeeSchema);
+const Employee = mongoose.model('Employee', employeeSchema);
 
-// Export the PostEmployee model
-module.exports = PostEmployee;
+module.exports = Employee;

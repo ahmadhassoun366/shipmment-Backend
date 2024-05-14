@@ -1,6 +1,25 @@
 // controllers/shipmentsController.js
 const Shipment = require("../models/shipments");
 const ShipmentItem = require("../models/shipmentItem");
+const Warehouse = require("../models/warehouse");
+
+const feeConfig = {
+  baseFee: 50,
+  sensitivityMultiplier: 1.25,
+  typeFees: {
+    Electronics: 1.2,
+    Clothing: 1.0,
+    Furniture: 1.5,
+    Pharmaceuticals: 1.3,
+    Food: 1.1,
+    Other: 1.0,
+  },
+  quantityDiscounts: [
+    { threshold: 50, discountFactor: 0.95 }, // 5% discount for quantities over 50
+    { threshold: 100, discountFactor: 0.9 }, // 10% discount for quantities over 100
+    { threshold: 200, discountFactor: 0.85 }, // 15% discount for quantities over 200
+  ],
+};
 
 async function createShipment(req, res) {
   try {
@@ -16,19 +35,36 @@ async function createShipment(req, res) {
       items,
     } = req.body;
 
-    // Create shipment items first
+    let totalShipmentFee = 0;
+
     const Items = [];
     for (const item of items) {
       const newItem = await ShipmentItem.create({
         name: item.name,
         quantity: item.quantity,
-        customer_id: customer_id,
-        isSensitive: item.isSensitive || false
+        isSensitive: item.isSensitive || false,
+        type: item.type,
       });
-      Items.push(newItem._id); // Use MongoDB's _id as item_id
+      Items.push(newItem._id);
+
+      let itemFee = feeConfig.baseFee * feeConfig.typeFees[item.type];
+
+      // Apply sensitivity multiplier
+      if (item.isSensitive) {
+        itemFee *= feeConfig.sensitivityMultiplier;
+      }
+
+      // Apply quantity discount
+      const discount = feeConfig.quantityDiscounts.find(
+        (d) => item.quantity > d.threshold
+      );
+      if (discount) {
+        itemFee *= discount.discountFactor;
+      }
+
+      totalShipmentFee += itemFee * item.quantity;
     }
 
-    // Create the shipment with the new shipment items
     const newShipment = await Shipment.create({
       customer_id,
       receiver_id,
@@ -41,20 +77,20 @@ async function createShipment(req, res) {
       Items: Items,
     });
 
-    res.status(201).json(newShipment);
+    res.status(201).json({
+      shipment: newShipment,
+      totalFee: totalShipmentFee,
+    });
   } catch (error) {
     console.error("Error:", error);
-    res.status(400).json({ data: error.message });
+    res.status(400).json({ message: error.message });
   }
 }
-
-  
-  
 
 // Controller method to retrieve all shipments
 async function getShipments(req, res) {
   try {
-    const shipments = await Shipment.find();
+    const shipments = await Shipment.find().populate("Items");
     res.json(shipments);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -64,7 +100,13 @@ async function getShipments(req, res) {
 // Controller method to retrieve a shipment by ID
 async function getShipmentById(req, res) {
   try {
-    const shipment = await Shipment.findById(req.params.id)
+    const shipmentId = req.query.id;
+    if (!shipmentId) {
+      return res.status(400).json({ message: "Shipment ID is required" });
+    }
+
+    const shipment = await Shipment.findById(shipmentId).populate("Items");
+
     if (!shipment) {
       return res.status(404).json({ message: "Shipment not found" });
     }
@@ -74,29 +116,33 @@ async function getShipmentById(req, res) {
   }
 }
 
-// Controller method to update a shipment
+// controllers/shipmentsController.js
+
 async function updateShipment(req, res) {
+  const { id } = req.params;
+  console.log("Updating shipment with ID:", id); // Log the ID
+  console.log("Request data:", req.body); // Log the full request body
+
   try {
-    const { shipmentItems, ...shipmentData } = req.body;
-
-    const updatedShipment = await Shipment.findByIdAndUpdate(
-      req.params.id,
-      shipmentData,
-      { new: true }
-    );
-
-    if (!updatedShipment) {
+    const shipment = await Shipment.findById(id);
+    if (!shipment) {
+      console.log("No shipment found for ID:", id);
       return res.status(404).json({ message: "Shipment not found" });
     }
 
-    if (shipmentItems && shipmentItems.length > 0) {
-      updatedShipment.shipmentItems = shipmentItems;
-      await updatedShipment.save();
-    }
+    // Update operations here, with logs after each operation
+    shipment.origin = req.body.shipmentData.origin || shipment.origin;
+    shipment.destination = req.body.shipmentData.destination || shipment.destination;
+    shipment.status = req.body.shipmentData.status || shipment.status;
 
-    res.json(updatedShipment);
+    console.log("Updated shipment details:", shipment);
+
+    // Save and respond
+    await shipment.save();
+    res.json({ message: "Shipment updated successfully", shipment });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error("Error updating shipment:", error);
+    res.status(500).json({ message: error.message });
   }
 }
 
@@ -114,47 +160,85 @@ async function deleteShipment(req, res) {
   }
 }
 // Controller method to retrieve shipments by user ID
+// controllers/shipmentsController.js
 async function getShipmentsByUserId(req, res) {
   try {
-    const userId = req.params.userId;
+    const userId = req.query.userId; // Get userId from query parameters
+    const employeeId = req.query.employeeId;
 
-    // Find shipments where the customer_id or receiver_id matches the user ID
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
     const shipments = await Shipment.find({
-      $or: [{ customer_id: userId }, { receiver_id: userId }],
-    });
+      $or: [
+        { customer_id: userId },
+        { receiver_id: userId },
+        { employeeId: userId },
+      ],
+    }).populate("Items");
 
     if (shipments.length === 0) {
-      return res.status(404).json({ message: "No shipments found for the provided user ID" });
+      return res
+        .status(404)
+        .json({ message: "No shipments found for the provided user ID" });
     }
 
     res.json(shipments);
   } catch (error) {
-    console.error(error); // Log the error for debugging
+    console.error("Error retrieving shipments:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 }
 
+// controllers/shipmentsController.js
 async function updateShipmentStatus(req, res) {
-  try {
-    const { shipmentId, newStatus } = req.body;
+  const { id } = req.params;
+  const { newStatus } = req.body;
 
-    // Find the shipment by ID
-    const shipment = await Shipment.findById(shipmentId);
+  try {
+    const shipment = await Shipment.findById(id);
     if (!shipment) {
       return res.status(404).json({ message: "Shipment not found" });
     }
 
-    // Check if the user is authorized (type === 'employee')
-    if (req.user.type !== 'Employee') {
-      return res.status(403).json({ message: "Only employees are authorized to update shipment status" });
-    }
+    console.log("Authenticated user details:", req.user);
 
-    // Update the shipment status
     shipment.status = newStatus;
     await shipment.save();
-
     res.json({ message: "Shipment status updated successfully" });
   } catch (error) {
+    console.error("Error updating shipment status:", error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
+// controllers/shipmentsController.js
+
+// create function to update the expected delivery date of a shipment
+async function updateShipmentExpirationDate(req, res) {
+  const { id } = req.params;
+  const { newExpirationDate } = req.body;
+
+  const date = new Date(newExpirationDate);
+  if (isNaN(date.getTime())) {
+    // date.getTime() is NaN if date is not valid
+    return res.status(400).json({ message: "Invalid date format" });
+  }
+
+  try {
+    const shipment = await Shipment.findById(id);
+    if (!shipment) {
+      return res.status(404).json({ message: "Shipment not found" });
+    }
+
+    shipment.expectedDeliveryDate = date;
+    await shipment.save();
+    res.json({
+      message: "Shipment expected delivery date updated successfully",
+    });
+  } catch (error) {
+    console.error("Error updating shipment expected delivery date:", error);
     res.status(500).json({ message: error.message });
   }
 }
@@ -167,4 +251,5 @@ module.exports = {
   deleteShipment,
   updateShipmentStatus,
   getShipmentsByUserId,
+  updateShipmentExpirationDate,
 };

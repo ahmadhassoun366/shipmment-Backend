@@ -1,16 +1,22 @@
 // controllers/accountController.js
 const Warehouse = require('../models/warehouse');
 
-// Controller method to create a new account
-async function createWarehouse(req, res) {
+// Updated function to create a new warehouse
+async function createWarehouse(employeeId) {
     try {
-        const newWarehouse = await Warehouse.create(req.body);
-        res.status(201).json(newWarehouse);
+        const warehouseData = {
+            name: "Default Warehouse Name", // Provide a default name or derive it from context
+            address: "Default Address",     // Provide a default address or derive it from context
+            employeeId: employeeId          // This comes from the newly created employee account
+        };
+        const newWarehouse = await Warehouse.create(warehouseData);
+        console.log('Warehouse created successfully:', newWarehouse);
+        return newWarehouse;
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        console.error('Failed to create warehouse:', error);
+        throw new Error('Failed to create warehouse: ' + error.message);
     }
 }
-
 // Controller method to retrieve all warehouses
 async function getWarehouses(req, res) {
     try {

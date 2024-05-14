@@ -4,7 +4,7 @@ const Receipt = require('../models/receipt');
 async function createReceipt(req, res) {
     try {
         const newReceipt = await Receipt.create(req.body);
-        res.status(201).json(newReceipt);
+        res.status(201).json(newReceipt);   
     } catch (error) {
         res.status(400).json({message: error.message });
     }
