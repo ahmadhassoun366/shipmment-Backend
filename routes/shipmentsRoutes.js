@@ -24,7 +24,9 @@ router.put("/updateStatus/:id", authenticate, shipmentsController.updateShipment
 router.get("/getShipments", authenticate, shipmentsController.getShipmentsByUserId);
 
 router.put('/updateExpectedDeliveryDate/:id', shipmentsController.updateShipmentExpirationDate);
+// according to userId 
 
+router.get('/statistics', shipmentsController.getShipmentStatistics);
 
 // Route to confirm receipt and update shipment status (accessible to receivers)
 router.put('/confirmReceipt/:id',

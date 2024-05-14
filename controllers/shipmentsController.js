@@ -132,7 +132,8 @@ async function updateShipment(req, res) {
 
     // Update operations here, with logs after each operation
     shipment.origin = req.body.shipmentData.origin || shipment.origin;
-    shipment.destination = req.body.shipmentData.destination || shipment.destination;
+    shipment.destination =
+      req.body.shipmentData.destination || shipment.destination;
     shipment.status = req.body.shipmentData.status || shipment.status;
 
     console.log("Updated shipment details:", shipment);
@@ -145,7 +146,6 @@ async function updateShipment(req, res) {
     res.status(500).json({ message: error.message });
   }
 }
-
 
 // Controller method to delete a shipment
 async function deleteShipment(req, res) {
@@ -242,6 +242,58 @@ async function updateShipmentExpirationDate(req, res) {
     res.status(500).json({ message: error.message });
   }
 }
+//  calculate the total number of shipments according to userId, the number of shipments by status, and the average delivery time for each shipmene.
+async function getShipmentStatistics(req, res) {
+  try {
+    const userId = req.query.userId;
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
+    const shipments = await Shipment.find({
+      $or: [{ customer_id: userId }, { receiver_id: userId }],
+    });
+
+    const totalShipments = shipments.length;
+    if (totalShipments === 0) {
+      return res.json({
+        totalShipments: 0,
+        statusCounts: {},
+        averageDeliveryTime: 0
+      });
+    }
+
+    const statusCounts = shipments.reduce((acc, shipment) => {
+      acc[shipment.status] = (acc[shipment.status] || 0) + 1;
+      return acc;
+    }, {});
+
+    const averageDeliveryTime = shipments.reduce((acc, shipment) => {
+        if (shipment.expectedDeliveryDate && shipment.shipmentDate) {
+          const startDate = new Date(shipment.shipmentDate);
+          const endDate = new Date(shipment.expectedDeliveryDate);
+          const deliveryTime = endDate - startDate;
+          return acc + deliveryTime;
+        }
+        return acc;
+      }, 0) / totalShipments;
+
+    const averageDeliveryDays = averageDeliveryTime / (1000 * 3600 * 24); // Converts ms to days
+
+    console.log(`Statistics retrieved for userId: ${userId}`); // Logging for monitoring
+
+    res.json({
+      totalShipments,
+      statusCounts,
+      averageDeliveryTime: averageDeliveryDays
+    });
+  } catch (error) {
+    console.error("Error retrieving shipment statistics:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+
 
 module.exports = {
   createShipment,
@@ -252,4 +304,5 @@ module.exports = {
   updateShipmentStatus,
   getShipmentsByUserId,
   updateShipmentExpirationDate,
+  getShipmentStatistics,
 };
