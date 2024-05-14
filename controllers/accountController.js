@@ -2,37 +2,59 @@
 const Account = require("../models/account");
 const bcrypt = require("bcryptjs");
 const generateToken = require("../utils/tokenUtils");
-const PostEmployee = require("../models/postEmployee");
+const { createWarehouse } = require("../controllers/warehouseController");
 
-
-// Controller method for user signup (create account)
 async function signup(req, res) {
   try {
-    // Hash the password before storing it in the database
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+      const { name, email, password, type } = req.body;
 
-    // Create a new account with hashed password
-    const newAccount = await Account.create({
-      ...req.body,
-      password: hashedPassword,
-    });
+      // Check if the email already exists
+      if (await Account.findOne({ email })) {
+          return res.status(409).json({ message: "Email already exists" });
+      }
 
-    // If the type is 'employee', create a PostEmployee entry
-    if (req.body.type === 'Employee') {
-      // Create a new post employee entry
-      const newEmployee = await PostEmployee.create({
-        name: req.body.name,
-        contact_info: req.body.contact_info,
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const newAccount = new Account({
+          name,
+          email,
+          password: hashedPassword,
+          type,
       });
-    }
 
-    // Respond with the created account
-    res.status(201).json(newAccount);
+      // Save the new account
+      const savedAccount = await newAccount.save();
+
+      // Additional actions based on the type of account
+      if (type === "Employee") {
+          try {
+              // Attempt to create a warehouse associated with this employee
+              await createWarehouse(savedAccount._id);
+          } catch (warehouseError) {
+              console.error('Error creating warehouse for user:', savedAccount._id, warehouseError);
+              return res.status(500).json({ message: "Failed to create warehouse for user." });
+          }
+      }
+
+      // Respond with success, note no token is sent
+      res.status(201).json({
+          message: "Signup successful",
+          user: {
+              id: savedAccount._id,
+              name: savedAccount.name,
+              email: savedAccount.email,
+              type: savedAccount.type,
+          },
+      });
   } catch (error) {
-    // Handle any errors
-    res.status(400).json({ message: error.message });
+      // Handle any potential errors during the signup process
+      res.status(500).json({ message: "Signup failed: " + error.message });
   }
 }
+
+
+
+
 async function signin(req, res) {
   try {
     // Verify user's credentials
@@ -49,7 +71,7 @@ async function signin(req, res) {
     const token = generateToken(user);
 
     // Respond with the JWT token and account type
-    res.json({ token, type: user.type });
+    res.json({ token, type: user.type , id : user._id});
   } catch (error) {
     // Handle any errors
     res.status(400).json({ message: error.message });

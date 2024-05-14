@@ -1,11 +1,15 @@
-// middleware/authenticate.js
 const jwt = require('jsonwebtoken');
 const Account = require('../models/account');
 
 async function authenticate(req, res, next) {
+    // Check if the authorization header is present and correctly formatted
+    if (!req.headers.authorization || !req.headers.authorization.startsWith('Bearer ')) {
+        return res.status(401).json({ message: 'No token provided or invalid token format' });
+    }
+
     try {
         // Get token from request headers
-        const token = req.headers.authorization.split(' ')[1];
+        const token = req.headers.authorization.split(' ')[1]; // Splitting 'Bearer <token>'
 
         // Verify and decode token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -14,7 +18,7 @@ async function authenticate(req, res, next) {
         const user = await Account.findById(decoded.id);
 
         if (!user) {
-            throw new Error('User not found');
+            return res.status(404).json({ message: 'User not found' });
         }
 
         // Attach user information to the request object
@@ -22,7 +26,7 @@ async function authenticate(req, res, next) {
 
         next();
     } catch (error) {
-        res.status(401).json({ message: 'Unauthorized' });
+        res.status(401).json({ message: 'Unauthorized: ' + error.message });
     }
 }
 
