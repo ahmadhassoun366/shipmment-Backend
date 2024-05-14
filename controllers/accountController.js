@@ -49,7 +49,7 @@ async function signin(req, res) {
     const token = generateToken(user);
 
     // Respond with the JWT token and account type
-    res.json({ token, type: user.type });
+    res.json({ token, type: user.type ,id:user.id});
   } catch (error) {
     // Handle any errors
     res.status(400).json({ message: error.message });

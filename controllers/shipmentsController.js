@@ -64,9 +64,7 @@ async function getShipments(req, res) {
 // Controller method to retrieve a shipment by ID
 async function getShipmentById(req, res) {
   try {
-    const shipment = await Shipment.findById(req.params.id).populate(
-      "shipmentItems"
-    );
+    const shipment = await Shipment.findById(req.params.id)
     if (!shipment) {
       return res.status(404).json({ message: "Shipment not found" });
     }
