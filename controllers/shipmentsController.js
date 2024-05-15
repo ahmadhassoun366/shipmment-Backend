@@ -294,7 +294,36 @@ async function getShipmentStatistics(req, res) {
 }
 
 
+async function getShipmentsByEmployeeWarehouse(req, res) {
+  try {
+    const employeeId = req.query.employeeId; // Get employeeId from query parameters
+    if (!employeeId) {
+      return res.status(400).json({ message: "Employee ID is required" });
+    }
 
+    // Find the warehouses managed by this employee
+    const warehouses = await Warehouse.find({ employeeId: employeeId });
+
+    // Extract warehouse IDs to use in the Shipment query
+    const warehouseIds = warehouses.map(warehouse => warehouse._id);
+
+    // Retrieve shipments from these warehouses
+    const shipments = await Shipment.find({
+      warehouseID: { $in: warehouseIds }
+    }).populate('Items');
+
+    if (shipments.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No shipments found for the given warehouses" });
+    }
+
+    res.json(shipments);
+  } catch (error) {
+    console.error("Error retrieving shipments:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
 module.exports = {
   createShipment,
   getShipments,
@@ -305,4 +334,5 @@ module.exports = {
   getShipmentsByUserId,
   updateShipmentExpirationDate,
   getShipmentStatistics,
+  getShipmentsByEmployeeWarehouse
 };

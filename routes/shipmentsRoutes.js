@@ -28,6 +28,8 @@ router.put('/updateExpectedDeliveryDate/:id', shipmentsController.updateShipment
 
 router.get('/statistics', shipmentsController.getShipmentStatistics);
 
+router.get('/shipments/employee-warehouse', shipmentsController.getShipmentsByEmployeeWarehouse);
+
 // Route to confirm receipt and update shipment status (accessible to receivers)
 router.put('/confirmReceipt/:id',
  authenticate, checkRole('Receiver'), async (req, res) => {
