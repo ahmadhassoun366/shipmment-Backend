@@ -4,8 +4,8 @@ const ShipmentItem = require("../models/shipmentItem");
 const Warehouse = require("../models/warehouse");
 
 const feeConfig = {
-  baseFee: 50,
-  sensitivityMultiplier: 1.25,
+  baseFee: 10,
+  sensitivityMultiplier: 0.25,
   typeFees: {
     Electronics: 1.2,
     Clothing: 1.0,
