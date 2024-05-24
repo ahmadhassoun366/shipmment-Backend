@@ -57,16 +57,6 @@ app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
-// Allow all origins
-app.use(cors());
-
-// Allow specific origin(s)
-app.use(
-  cors({
-    origin: "https://shipmment-backend.vercel.app/",
-  })
-);
-
 app.use(express.static("public"));
 
 // A simple get greet method
