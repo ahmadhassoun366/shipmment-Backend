@@ -59,8 +59,6 @@ app.listen(PORT, () => {
 });
 
 // A simple get greet method
-app.get("/greet", (req, res) => {
-  // get the passed query
-  const { name } = req.query;
-  res.send({ msg: `Welcome ${name}!` });
+app.get("/home", (req, res) => {
+  res.status(200).json("Welcome, your app is working well");
 });
