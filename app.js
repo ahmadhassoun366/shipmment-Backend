@@ -58,12 +58,9 @@ app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
-// Allow all origins
-app.use(cors());
-
-// Allow specific origin(s)
-app.use(
-  cors({
-    origin: "https://shipmment-backend.vercel.app/",
-  })
-);
+// A simple get greet method
+app.get("/greet", (req, res) => {
+  // get the passed query
+  const { name } = req.query;
+  res.send({ msg: `Welcome ${name}!` });
+});
